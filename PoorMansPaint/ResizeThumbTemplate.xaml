@@ -1,0 +1,31 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <sys:Int32 x:Key="BorderEdge">30</sys:Int32>
+    <sys:Int32 x:Key="SmallSquareEdge">6</sys:Int32>
+    <sys:Int32 x:Key="SmallSquareStroke">1</sys:Int32>
+    <Style x:Key="ResizeThumbTemplate" 
+           TargetType="Thumb">
+        <Style.Resources>
+        </Style.Resources>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Thumb">
+                    <Border Width="{Binding Source={StaticResource BorderEdge}}" 
+                            Height="{Binding Source={StaticResource BorderEdge}}"
+                            BorderBrush="Transparent"
+                            Background="Transparent"
+                            BorderThickness="0">
+                        <Rectangle Width="{Binding Source={StaticResource SmallSquareEdge}}" 
+                                   Height="{Binding Source={StaticResource SmallSquareEdge}}"
+                                   Fill="White" 
+                                   Stroke="Black" StrokeThickness="{Binding Source={StaticResource SmallSquareStroke}}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
