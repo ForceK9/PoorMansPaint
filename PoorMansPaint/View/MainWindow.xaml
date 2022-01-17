@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent"
-        xmlns:zoom="clr-namespace:Wpf.Controls.PanAndZoom;assembly=Wpf.Controls.PanAndZoom"
         xmlns:local="clr-namespace:PoorMansPaint"
         mc:Ignorable="d"
         Title="Poorman's Paint" Height="600" Width="1000"

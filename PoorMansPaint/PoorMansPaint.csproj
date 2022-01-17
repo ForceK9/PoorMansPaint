@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <PackageReference Include="Fluent.Ribbon" Version="9.0.1" />
-    <PackageReference Include="Wpf.Controls.PanAndZoom" Version="2.3.4" />
   </ItemGroup>
 
   <ItemGroup>
