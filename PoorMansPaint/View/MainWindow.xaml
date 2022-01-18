@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent"
         xmlns:local="clr-namespace:PoorMansPaint"
+        xmlns:view="clr-namespace:PoorMansPaint.View"
         mc:Ignorable="d"
         Title="Poorman's Paint" Height="600" Width="1000"
         MinHeight="400" MinWidth="600" Loaded="Window_Loaded">
@@ -42,12 +43,14 @@
                     Background="LightGray"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top">
-                <Canvas x:Name="canvas"
+                <view:ZoomableCanvas x:Name="canvas"
                         Canvas.Left="{Binding Source={x:Static local:MainWindow.EaselToCanvasMargin}}" 
                         Canvas.Top="{Binding Source={x:Static local:MainWindow.EaselToCanvasMargin}}"
                         Panel.ZIndex="10"
                         Background="White"
-                        Width="800" Height="350"/>
+                        Width="100" Height="200">
+                    <Button Canvas.Left="50" Canvas.Top="100" Content="Button"/>
+                </view:ZoomableCanvas>
                 <Rectangle x:Name="rectPreviewResize"
                            Canvas.Left="{Binding ElementName=canvas, Path=(Canvas.Left)}"
                            Canvas.Top="{Binding ElementName=canvas, Path=(Canvas.Top)}"

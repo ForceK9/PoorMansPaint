@@ -1,6 +1,4 @@
-﻿using Fluent;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -15,10 +13,14 @@ namespace PoorMansPaint
     {
         public static readonly int EaselToCanvasMargin = 30;
         public static readonly RoutedCommand ResizeHorizontalCommand = new RoutedCommand();
+        
         public MainWindow()
         {
             InitializeComponent();
-            canvas.SizeChanged += OnCanvasSizeChanged;
+
+            // resizing-related callbacks
+            canvas.SizeChanged += OnCanvasChanged;
+            canvas.ZoomLevelChanged += OnCanvasChanged;
             thumbHorizontal.DragStarted += OnResizeThumbDragStarted;
             thumbVertical.DragStarted += OnResizeThumbDragStarted;
             thumbBoth.DragStarted += OnResizeThumbDragStarted;
@@ -34,6 +36,25 @@ namespace PoorMansPaint
             thumbBoth.DragCompleted += OnResizeVerticalDragCompleted;
 
             viewer.ScrollChanged += OnScrollChanged;
+
+            // zooming-related callbacks
+            easel.MouseWheel += OnEaselMouseWheel;
+        }
+
+        private void OnEaselMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            // ctrl + mouse wheel to zoom
+            if (Keyboard.Modifiers != ModifierKeys.Control) return;
+            if (e.Delta > 0)
+            {
+                // mouse wheel rotate down, zoom in
+                canvas.ZoomOut();
+            }
+            else
+            {
+                // mouse wheel rotate up, zoom in
+                canvas.ZoomIn();
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -44,8 +65,8 @@ namespace PoorMansPaint
 
         private void RecalculateEaselSize()
         {
-            easel.Width = Math.Max(canvas.Width + 2 * EaselToCanvasMargin, viewer.ViewportWidth);
-            easel.Height = Math.Max(canvas.Height + 2 * EaselToCanvasMargin, viewer.ViewportHeight);
+            easel.Width = Math.Max(canvas.RealWidth + 2 * EaselToCanvasMargin, viewer.ViewportWidth);
+            easel.Height = Math.Max(canvas.RealHeight + 2 * EaselToCanvasMargin, viewer.ViewportHeight);
         }
 
         private void RelocateResizeThumbs()
@@ -55,11 +76,11 @@ namespace PoorMansPaint
             int stroke = (int)FindResource("SmallSquareStroke");
             double centerOffset = borderEdge / 2;
             double offset = centerOffset - (smallSquareEdge/2 + stroke) + 1;
-            double middleX = EaselToCanvasMargin + canvas.Width / 2 - centerOffset;
-            double rightX = EaselToCanvasMargin + canvas.Width - offset;
-            double middleY = EaselToCanvasMargin + canvas.Height / 2 - centerOffset;
-            double bottomY = EaselToCanvasMargin + canvas.Height - offset;
-
+            double middleX = EaselToCanvasMargin + canvas.RealWidth / 2 - centerOffset;
+            double rightX = EaselToCanvasMargin + canvas.RealWidth - offset;
+            double middleY = EaselToCanvasMargin + canvas.RealHeight / 2 - centerOffset;
+            double bottomY = EaselToCanvasMargin + canvas.RealHeight - offset;
+            
             thumbHorizontal.SetValue(Canvas.LeftProperty, rightX);
             thumbHorizontal.SetValue(Canvas.TopProperty, middleY);
 
@@ -75,7 +96,7 @@ namespace PoorMansPaint
             RecalculateEaselSize();
         }
 
-        private void OnCanvasSizeChanged(object sender, SizeChangedEventArgs e)
+        private void OnCanvasChanged(object sender, SizeChangedEventArgs e)
         {
             // place the 3 thumbs in their correct positions
             RelocateResizeThumbs();
@@ -91,13 +112,13 @@ namespace PoorMansPaint
                 (double)canvas.GetValue(Canvas.LeftProperty) - 1);
             rectPreviewResize.SetValue(Canvas.TopProperty,
                 (double)canvas.GetValue(Canvas.TopProperty) - 1);
-            rectPreviewResize.Width = canvas.Width + 2;
-            rectPreviewResize.Height = canvas.Height + 2;
+            rectPreviewResize.Width = canvas.RealWidth + 2;
+            rectPreviewResize.Height = canvas.RealHeight + 2;
         }
 
         private void OnResizeThumbHorizontalDragDelta(object sender, DragDeltaEventArgs e)
         {
-            double newWidth = canvas.Width + e.HorizontalChange;
+            double newWidth = canvas.RealWidth + e.HorizontalChange;
             if (newWidth >= 0)
             {
                 rectPreviewResize.Width = newWidth;
@@ -111,7 +132,7 @@ namespace PoorMansPaint
 
         private void OnResizeThumbVerticalDragDelta(object sender, DragDeltaEventArgs e)
         {
-            double newHeight = canvas.Height + e.VerticalChange;
+            double newHeight = canvas.RealHeight + e.VerticalChange;
             if (newHeight >= 0)
             {
                 rectPreviewResize.Height = newHeight;
@@ -125,13 +146,13 @@ namespace PoorMansPaint
 
         private void OnResizeHorizontalDragCompleted(object sender, DragCompletedEventArgs e)
         {
-            canvas.Width = rectPreviewResize.Width - 2;
+            canvas.RealWidth = rectPreviewResize.Width - 2;
             rectPreviewResize.Visibility = Visibility.Hidden;
         }
 
         private void OnResizeVerticalDragCompleted(object sender, DragCompletedEventArgs e)
         {
-            canvas.Height = rectPreviewResize.Height - 2;
+            canvas.RealHeight = rectPreviewResize.Height - 2;
             rectPreviewResize.Visibility = Visibility.Hidden;
         }
     }
