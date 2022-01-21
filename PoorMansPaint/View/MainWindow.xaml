@@ -17,12 +17,33 @@
                 <ToolBar>
                     <Menu>
                         <MenuItem Header="File">
-                            <MenuItem Header="New"/>
-                            <MenuItem Header="Open"/>
+                            <MenuItem Header="New"
+                                      InputGestureText="Ctrl+N"/>
+                            <MenuItem Header="Open"
+                                      InputGestureText="Ctrl+O"/>
+                            <MenuItem Header="Save"
+                                      InputGestureText="Ctrl+S"
+                                      Command="{x:Static local:MainWindow.RasterizeCommand}"
+                                      CommandParameter="s"/>
+                            <MenuItem Header="Save As">
+                                <MenuItem Header="PNG picture"
+                                          Command="{x:Static local:MainWindow.RasterizeCommand}"
+                                          CommandParameter="n.png"/>
+                                <MenuItem Header="JPEG picture"
+                                          Command="{x:Static local:MainWindow.RasterizeCommand}"
+                                          CommandParameter="n.jpeg"/>
+                                <MenuItem Header="BMP picture"
+                                          Command="{x:Static local:MainWindow.RasterizeCommand}"
+                                          CommandParameter="n.bmp"/>
+                                <MenuItem Header="GIF picture"
+                                          Command="{x:Static local:MainWindow.RasterizeCommand}"
+                                          CommandParameter="n.gif"/>
+                                <MenuItem Header="Other format"
+                                          Command="{x:Static local:MainWindow.RasterizeCommand}"
+                                          CommandParameter="n"/>
+                            </MenuItem>
                         </MenuItem>
                         <MenuItem Header="View">
-                            <MenuItem Header="New"/>
-                            <MenuItem Header="Open"/>
                         </MenuItem>
                     </Menu>
                     <Separator/>
@@ -42,20 +63,21 @@
             <Canvas x:Name="easel" 
                     Background="LightGray"
                     HorizontalAlignment="Left"
-                    VerticalAlignment="Top">
+                    VerticalAlignment="Top"
+                    RenderOptions.BitmapScalingMode="NearestNeighbor">
                 <view:ZoomableCanvas x:Name="canvas"
                         Canvas.Left="{Binding Source={x:Static local:MainWindow.EaselToCanvasMargin}}" 
                         Canvas.Top="{Binding Source={x:Static local:MainWindow.EaselToCanvasMargin}}"
                         Panel.ZIndex="10"
                         Background="White"
-                        Width="100" Height="200">
-                    <Button Canvas.Left="50" Canvas.Top="100" Content="Button"/>
-                </view:ZoomableCanvas>
+                        Width="500px" Height="300px"
+                        ClipToBounds="True"
+                        RenderOptions.BitmapScalingMode="NearestNeighbor"/>
                 <Rectangle x:Name="rectPreviewResize"
                            Canvas.Left="{Binding ElementName=canvas, Path=(Canvas.Left)}"
                            Canvas.Top="{Binding ElementName=canvas, Path=(Canvas.Top)}"
                            StrokeDashArray="2 2" StrokeThickness="1" Stroke="Black"
-                           Width="800" Height="350"
+                           Width="500" Height="300"
                            Panel.ZIndex="15"
                            Visibility="Hidden"/>
                 <Thumb x:Name="thumbHorizontal"

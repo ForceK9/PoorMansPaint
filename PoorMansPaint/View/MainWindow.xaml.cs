@@ -1,8 +1,13 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
+using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace PoorMansPaint
 {
@@ -12,7 +17,8 @@ namespace PoorMansPaint
     public partial class MainWindow : Window
     {
         public static readonly int EaselToCanvasMargin = 30;
-        public static readonly RoutedCommand ResizeHorizontalCommand = new RoutedCommand();
+        public static readonly RoutedCommand RasterizeCommand = new RoutedCommand();
+        private ImageEncoder encoder = new ImageEncoder();
         
         public MainWindow()
         {
@@ -39,12 +45,21 @@ namespace PoorMansPaint
 
             // zooming-related callbacks
             easel.MouseWheel += OnEaselMouseWheel;
+
+            // rasterize command
+            CommandBindings.Add(new CommandBinding(
+                RasterizeCommand,
+                RasterizeCommand_Executed,
+                RasterizeCommand_CanExecute));
+
         }
 
         private void OnEaselMouseWheel(object sender, MouseWheelEventArgs e)
         {
             // ctrl + mouse wheel to zoom
             if (Keyboard.Modifiers != ModifierKeys.Control) return;
+            Point point = e.GetPosition(easel);
+            Trace.WriteLine(point);
             if (e.Delta > 0)
             {
                 // mouse wheel rotate down, zoom in
@@ -52,9 +67,17 @@ namespace PoorMansPaint
             }
             else
             {
-                // mouse wheel rotate up, zoom in
+                // mouse wheel rotate up, zoom out
                 canvas.ZoomIn();
             }
+
+            //Trace.WriteLine(e.GetPosition(easel));
+            //Trace.WriteLine("------------");
+            viewer.ScrollToHorizontalOffset(point.X - viewer.ViewportWidth / 2 / canvas.CurrentZoom);
+            viewer.ScrollToVerticalOffset(point.Y - viewer.ViewportHeight / 2 / canvas.CurrentZoom);
+            //Trace.WriteLine((point.X - viewer.ViewportWidth / 2 / canvas.CurrentZoom) + "," + (point.Y - viewer.ViewportHeight / 2 / canvas.CurrentZoom));
+            //Trace.WriteLine(viewer.ContentHorizontalOffset + "," + viewer.ContentVerticalOffset);
+            e.Handled = true;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -93,7 +116,8 @@ namespace PoorMansPaint
 
         private void OnScrollChanged(object sender, ScrollChangedEventArgs e)
         {
-            RecalculateEaselSize();
+            if (e.ViewportHeightChange != 0 || e.ViewportWidthChange != 0)
+                RecalculateEaselSize();
         }
 
         private void OnCanvasChanged(object sender, SizeChangedEventArgs e)
@@ -154,6 +178,34 @@ namespace PoorMansPaint
         {
             canvas.RealHeight = rectPreviewResize.Height - 2;
             rectPreviewResize.Visibility = Visibility.Hidden;
+        }
+
+        private void RasterizeCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        // https://docs.microsoft.com/en-us/dotnet/desktop/wpf/graphics-multimedia/imaging-overview?view=netframeworkdesktop-4.8
+        private void RasterizeCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            BitmapSource bmp = canvas.CreateBitmap();
+
+            // open SaveFileDialog and save bitmap to file
+            string parameter = (string)e.Parameter;
+            char command = parameter[0];
+            string extension = parameter.Substring(1);
+            switch (command)
+            {
+                case 's':
+                    encoder.Save(bmp);
+                    break;
+                case 'n':
+                    encoder.SaveToNewFile(bmp, extension);
+                    break;
+                default:
+                    throw new InvalidOperationException("Command: " + command);
+            }
+            e.Handled = true;
         }
     }
 }
