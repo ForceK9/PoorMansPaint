@@ -48,6 +48,11 @@ namespace PoorMansPaint
             // zooming-related callbacks
             easel.MouseWheel += OnEaselMouseWheel;
 
+            // drawing callbacks
+            easel.MouseDown += OnEaselMouseDown;
+            easel.MouseMove += OnEaselMouseMove;
+            easel.MouseUp += OnEaselMouseUp;
+
             // rasterize command
             CommandBindings.Add(new CommandBinding(
                 RasterizeCommand,
@@ -63,6 +68,29 @@ namespace PoorMansPaint
                 RedoCommand,
                 RedoCommand_Executed,
                 RedoCommand_CanExecute));
+        }
+
+        private void OnEaselMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                canvas.StartDrawingAt(e.GetPosition(canvas));
+            }
+        }
+
+        private void OnEaselMouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                //Trace.WriteLine(e.GetPosition(this));
+                canvas.ContinueDrawingAt(e.GetPosition(canvas));
+            }
+            base.OnMouseMove(e);
+        }
+
+        private void OnEaselMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            canvas.FinishDrawing();
         }
 
         private void OnEaselMouseWheel(object sender, MouseWheelEventArgs e)

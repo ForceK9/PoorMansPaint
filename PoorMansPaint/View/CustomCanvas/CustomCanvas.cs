@@ -97,55 +97,65 @@ namespace PoorMansPaint.View.CustomCanvas
             return new Point(Math.Floor(p.X), Math.Floor(p.Y));
         }
 
-        protected override void OnMouseDown(MouseButtonEventArgs e)
+        public bool IsDrawing()
         {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                _currentPathGeometry = new PathGeometry();
-                PathFigure figure = new PathFigure()
-                {
-                    StartPoint = GetRoundedPoint(e.GetPosition(this)),
-                };
-                Point tmp = new Point(figure.StartPoint.X, figure.StartPoint.Y);
-                figure.Segments.Add(new LineSegment(tmp, true));
-                _currentPathGeometry.Figures.Add(figure);
-                Commander.Command(new DrawWithPencilCommand(_currentPathGeometry));
-            }
-            base.OnMouseDown(e);
+            return _currentPathGeometry != null;
         }
 
-        protected override void OnMouseMove(MouseEventArgs e)
+        public void StartDrawingAt(Point pos)
         {
-            if (e.LeftButton == MouseButtonState.Pressed)
+            // check in range
+            if (!(pos.X >= 0 && pos.Y >= 0 && pos.X <= Width && pos.Y <= Height))
+                return;
+
+            // ok, start new drawing
+            _currentPathGeometry = new PathGeometry();
+            PathFigure figure = new PathFigure()
             {
-                //Trace.WriteLine(e.GetPosition(this));
-                PathFigure figure = _currentPathGeometry.Figures[0];
+                StartPoint = GetRoundedPoint(pos),
+            };
+            Point tmp = new Point(figure.StartPoint.X, figure.StartPoint.Y);
+            figure.Segments.Add(new LineSegment(tmp, true));
+            _currentPathGeometry.Figures.Add(figure);
+
+            // drawing with pencil is an UndoableCommand
+            Commander.Command(new DrawWithPencilCommand(_currentPathGeometry));
+        }
+        public void ContinueDrawingAt(Point pos)
+        {
+            if (!IsDrawing()) return;
+            // check in range
+            if (pos.X >= 0 && pos.Y >= 0 && pos.X <= Width && pos.Y <= Height)
+            {
+                // in range
+                int lastSegmentIndex = _currentPathGeometry.Figures.Count - 1;  
+                PathFigure figure = _currentPathGeometry.Figures[lastSegmentIndex];
+                if (figure.StartPoint.Equals(new Point(-1, -1)))
+                {
+                    // (-1,-1) is 'null' point we assigned below
+                    // which means we start a new segment
+                    figure.StartPoint = pos;
+                }
+
+                // draw a line from the last point
                 figure.Segments.Add(new LineSegment(
-                    GetRoundedPoint(e.GetPosition(this)), 
+                    GetRoundedPoint(pos),
                     true));
             }
-            base.OnMouseMove(e);
-        }
-
-        protected override void OnMouseUp(MouseButtonEventArgs e)
-        {
-            if (_currentPathGeometry != null)
+            else
             {
-                _currentPathGeometry.Freeze();
-                /*
-                DrawingVisual drawingVisual = new DrawingVisual();
-                using (var draw = drawingVisual.RenderOpen())
-                {
-                    draw.DrawDrawing(_drawingGroup);
-                }
-                var bmp = new RenderTargetBitmap((int)Width, (int)Height, 96, 96, PixelFormats.);
-                bmp.Render(drawingVisual);
-                Image image = new Image();
-                image.Source = bmp;
-                this.Children.Clear();
-                this.Children.Add(image);*/
+                // out of range, start a new segment but without a start point
+                // the start point will be assigned when in range again
+                PathFigure figure = new PathFigure() { StartPoint = new Point(-1,-1)};
+                _currentPathGeometry.Figures.Add(figure);
             }
-            base.OnMouseUp(e);
+
+        }
+        public void FinishDrawing()
+        {
+            if (_currentPathGeometry == null) return;
+            _currentPathGeometry.Freeze();
+            _currentPathGeometry = null;
         }
 
         public BitmapSource CreateBitmap()
