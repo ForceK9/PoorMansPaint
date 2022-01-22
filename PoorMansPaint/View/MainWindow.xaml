@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:PoorMansPaint"
         xmlns:canvas="clr-namespace:PoorMansPaint.View.CustomCanvas"
         mc:Ignorable="d"
@@ -131,14 +132,76 @@
                             <Setter Property="GroupName" Value="tools"/>
                         </Style>
                     </Fluent:RibbonGroupBox.Resources>
-                    <RadioButton Height="35">
+                    <RadioButton Height="35" ToolTip="Pencil" IsChecked="True">
                         <Image Source="{StaticResource icon-pencil}"/>
                     </RadioButton>
-                    <RadioButton Height="35">
+                    <RadioButton Height="35" ToolTip="Magnifier">
                         <Image Source="{StaticResource icon-magnifier}"/>
                     </RadioButton>
                 </Fluent:RibbonGroupBox>
-                <Fluent:RibbonGroupBox Header="Shapes"/>
+                <Fluent:RibbonGroupBox Header="Shapes">
+                    <Fluent:RibbonGroupBox.Resources>
+                        <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="GroupName" Value="tools"/>
+                            <Setter Property="Height" Value="25"/>
+                            <Setter Property="Width" Value="25"/>
+                            <Setter Property="LayoutTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="1.5" ScaleY="1.5"/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="GroupName" Value="tools"/>
+                        </Style>
+                    </Fluent:RibbonGroupBox.Resources>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <WrapPanel Name="shapesPanel"
+                                   Width="200" Orientation="Horizontal">
+                            <RadioButton ToolTip="Line">
+                                <Line X1="1" Y1="1"
+                                      X2="16" Y2="16" 
+                                      Stroke="Black" StrokeThickness="1"/>
+                            </RadioButton>
+                            <RadioButton ToolTip="Ellipse">
+                                <Ellipse Width="19" Height="16"
+                                      Stroke="Black" StrokeThickness="1"/>
+                            </RadioButton>
+                            <RadioButton ToolTip="Rectangle">
+                                <Rectangle Width="18" Height="15"
+                                           Stroke="Black" StrokeThickness="1"/>
+                            </RadioButton>
+                        </WrapPanel>
+                    </ScrollViewer>
+                </Fluent:RibbonGroupBox>
+                <Fluent:RibbonGroupBox Header="Options">
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="110"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                        </Grid.RowDefinitions>
+
+                        <ComboBox Grid.Column="1"
+                                  VerticalAlignment="Center">
+                        </ComboBox>
+                        <TextBlock Text="Size" VerticalAlignment="Center" 
+                                   Margin="0,0,8,0"
+                                   TextAlignment="Right"/>
+                        <xctk:ColorPicker Grid.Column="1" Grid.Row="1"
+                                          VerticalAlignment="Center"
+                                          SelectedColor="Black"
+                                          DisplayColorAndName="True"/>
+                        <TextBlock Grid.Row="1"
+                                   Text="Color" VerticalAlignment="Center" 
+                                   Margin="0,0,8,0"
+                                   TextAlignment="Right"/>
+
+                    </Grid>
+                </Fluent:RibbonGroupBox>
             </Fluent:RibbonTabItem>
         </Fluent:Ribbon>
         <ScrollViewer x:Name="viewer"
