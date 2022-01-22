@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using PoorMansPaint.View.CustomCanvas;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -18,6 +19,8 @@ namespace PoorMansPaint
     {
         public static readonly int EaselToCanvasMargin = 30;
         public static readonly RoutedCommand RasterizeCommand = new RoutedCommand();
+        public static readonly RoutedCommand UndoCommand = new RoutedCommand();
+        public static readonly RoutedCommand RedoCommand = new RoutedCommand();
         private ImageEncoder encoder = new ImageEncoder();
         
         public MainWindow()
@@ -38,8 +41,7 @@ namespace PoorMansPaint
 
             thumbHorizontal.DragCompleted += OnResizeHorizontalDragCompleted;
             thumbVertical.DragCompleted += OnResizeVerticalDragCompleted;
-            thumbBoth.DragCompleted += OnResizeHorizontalDragCompleted;
-            thumbBoth.DragCompleted += OnResizeVerticalDragCompleted;
+            thumbBoth.DragCompleted += OnResizeDragCompleted;
 
             viewer.ScrollChanged += OnScrollChanged;
 
@@ -52,6 +54,15 @@ namespace PoorMansPaint
                 RasterizeCommand_Executed,
                 RasterizeCommand_CanExecute));
 
+            // undo redo commands
+            CommandBindings.Add(new CommandBinding(
+                UndoCommand,
+                UndoCommand_Executed,
+                UndoCommand_CanExecute));
+            CommandBindings.Add(new CommandBinding(
+                RedoCommand,
+                RedoCommand_Executed,
+                RedoCommand_CanExecute));
         }
 
         private void OnEaselMouseWheel(object sender, MouseWheelEventArgs e)
@@ -170,13 +181,30 @@ namespace PoorMansPaint
 
         private void OnResizeHorizontalDragCompleted(object sender, DragCompletedEventArgs e)
         {
-            canvas.RealWidth = rectPreviewResize.Width - 2;
+            //canvas.RealWidth = rectPreviewResize.Width - 2;
+            canvas.Commander.Command(
+                new ChangeCanvasRealSizeCommand(
+                    rectPreviewResize.Width - 2,
+                    canvas.RealHeight));
             rectPreviewResize.Visibility = Visibility.Hidden;
         }
 
         private void OnResizeVerticalDragCompleted(object sender, DragCompletedEventArgs e)
         {
-            canvas.RealHeight = rectPreviewResize.Height - 2;
+            //canvas.RealHeight = rectPreviewResize.Height - 2;
+            canvas.Commander.Command(
+                new ChangeCanvasRealSizeCommand(
+                    canvas.RealWidth, 
+                    rectPreviewResize.Height - 2));
+            rectPreviewResize.Visibility = Visibility.Hidden;
+        }
+
+        private void OnResizeDragCompleted(object sender, DragCompletedEventArgs e)
+        {
+            canvas.Commander.Command(
+                new ChangeCanvasRealSizeCommand(
+                    rectPreviewResize.Width - 2, 
+                    rectPreviewResize.Height - 2));
             rectPreviewResize.Visibility = Visibility.Hidden;
         }
 
@@ -206,6 +234,26 @@ namespace PoorMansPaint
                     throw new InvalidOperationException("Command: " + command);
             }
             e.Handled = true;
+        }
+
+        private void UndoCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = canvas.Commander.IsUndoingPossible();
+        }
+
+        private void UndoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            canvas.Commander.Undo();
+        }
+        
+        private void RedoCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = canvas.Commander.IsRedoingPossible();
+        }
+
+        private void RedoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            canvas.Commander.Redo();
         }
     }
 }

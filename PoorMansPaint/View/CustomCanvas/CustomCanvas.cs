@@ -8,16 +8,17 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace PoorMansPaint.View
+namespace PoorMansPaint.View.CustomCanvas
 {
-    public class ZoomableCanvas : Canvas
+    // a canvas that is resizable, zoomable and operations on it are undoable
+    public class CustomCanvas : Canvas
     {
         public static readonly double[] ZoomLevel = { 0.125, 0.25, 0.5, 0.75, 1, 2, 3, 4, 5, 6, 7, 8 };
         protected static int DEFAULT_ZOOM_INDEX = 4;
         protected int currentZoomIdx;
         public event SizeChangedEventHandler ZoomLevelChanged;
 
-        protected DrawingGroup _drawingGroup;
+        public DrawingGroup DrawingGroup { get; set; }
         protected PathGeometry? _currentPathGeometry;
 
         private ScaleTransform GetCanvasScale()
@@ -50,13 +51,16 @@ namespace PoorMansPaint.View
         }
 
         public double CurrentZoom { get { return ZoomLevel[currentZoomIdx]; } }
-        public ZoomableCanvas () : base()
+        public CanvasCommander Commander { get; }
+
+        public CustomCanvas () : base()
         {
             ScaleTransform scale = new ScaleTransform();
             LayoutTransform = scale;
             ZoomLevelChanged += UpdateZoom;
             SetZoomLevelIndex(DEFAULT_ZOOM_INDEX);
-            _drawingGroup = new DrawingGroup();
+            DrawingGroup = new DrawingGroup();
+            Commander = new CanvasCommander(this);
         }
         private void SetZoomLevelIndex(int idx)
         {
@@ -85,7 +89,7 @@ namespace PoorMansPaint.View
         protected override void OnRender(DrawingContext dc)
         {
             base.OnRender(dc);
-            dc.DrawDrawing(_drawingGroup);
+            dc.DrawDrawing(DrawingGroup);
         } 
 
         private Point GetRoundedPoint(Point p)
@@ -105,17 +109,7 @@ namespace PoorMansPaint.View
                 Point tmp = new Point(figure.StartPoint.X, figure.StartPoint.Y);
                 figure.Segments.Add(new LineSegment(tmp, true));
                 _currentPathGeometry.Figures.Add(figure);
-                using (DrawingContext dgdc = _drawingGroup.Append())
-                {
-                    _drawingGroup.Children.Add(new GeometryDrawing(null,
-                        new Pen(Brushes.Black, 1)
-                        {
-                            StartLineCap = PenLineCap.Round,
-                            EndLineCap = PenLineCap.Round,
-                            LineJoin = PenLineJoin.Round,
-                        },
-                        _currentPathGeometry));
-                }
+                Commander.Command(new DrawWithPencilCommand(_currentPathGeometry));
             }
             base.OnMouseDown(e);
         }

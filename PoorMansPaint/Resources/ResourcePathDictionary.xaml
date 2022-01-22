@@ -1,0 +1,17 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ImageSource x:Key="icon-load">/Resources/icon-load.png</ImageSource>
+    <ImageSource x:Key="icon-add">/Resources/icon-add.png</ImageSource>
+    <ImageSource x:Key="icon-arrow-up">/Resources/icon-arrow-up.png</ImageSource>
+    <ImageSource x:Key="icon-arrow-down">/Resources/icon-arrow-down.png</ImageSource>
+    <ImageSource x:Key="icon-arrow-right">/Resources/icon-arrow-right.png</ImageSource>
+    <ImageSource x:Key="icon-file">/Resources/icon-file.png</ImageSource>
+    <ImageSource x:Key="icon-floppy">/Resources/icon-floppy.png</ImageSource>
+    <ImageSource x:Key="icon-sort">/Resources/icon-sort.png</ImageSource>
+    <ImageSource x:Key="icon-trash">/Resources/icon-trash.png</ImageSource>
+    <ImageSource x:Key="icon-info">/Resources/icon-info.png</ImageSource>
+    <ImageSource x:Key="icon-undo">/Resources/icon-undo.png</ImageSource>
+    <ImageSource x:Key="icon-redo">/Resources/icon-redo.png</ImageSource>
+    <ImageSource x:Key="icon-pencil">/Resources/icon-pencil.png</ImageSource>
+    <ImageSource x:Key="icon-magnifier">/Resources/icon-magnifier.png</ImageSource>
+</ResourceDictionary>

@@ -5,27 +5,76 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent"
         xmlns:local="clr-namespace:PoorMansPaint"
-        xmlns:view="clr-namespace:PoorMansPaint.View"
+        xmlns:canvas="clr-namespace:PoorMansPaint.View.CustomCanvas"
         mc:Ignorable="d"
         Title="Poorman's Paint" Height="600" Width="1000"
         MinHeight="400" MinWidth="600" Loaded="Window_Loaded">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary 
+                    Source="/Resources/ResourcePathDictionary.xaml">
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="Image">
+                <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
+            </Style>
+            <Style TargetType="Button" x:Key="DefaultButtonStyle">
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Opacity" Value="0.2"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Ctrl" Key="S" 
+                    Command="{x:Static local:MainWindow.RasterizeCommand}"
+                    CommandParameter="s"/>
+        <KeyBinding Modifiers="Ctrl" Key="Z" 
+                    Command="{x:Static local:MainWindow.UndoCommand}"/>
+        <KeyBinding Modifiers="Ctrl+Shift" Key="Z" 
+                    Command="{x:Static local:MainWindow.RedoCommand}"/>
+    </Window.InputBindings>
     <DockPanel LastChildFill="True">
         <Fluent:Ribbon DockPanel.Dock="Top"
                        Height="150"
                        AreTabHeadersVisible="False">
             <Fluent:Ribbon.Menu>
-                <ToolBar>
-                    <Menu>
+                <ToolBar Height="30">
+                    <ToolBar.Resources>
+                        <Style TargetType="Image">
+                            <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
+                            <Setter Property="Height" Value="20"/>
+                        </Style>
+                    </ToolBar.Resources>
+                    <Menu Background="Transparent">
                         <MenuItem Header="File">
                             <MenuItem Header="New"
-                                      InputGestureText="Ctrl+N"/>
+                                      InputGestureText="Ctrl+N">
+                                <MenuItem.Icon>
+                                    <Image Source="{StaticResource icon-file}"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
                             <MenuItem Header="Open"
-                                      InputGestureText="Ctrl+O"/>
+                                      InputGestureText="Ctrl+O">
+                                <MenuItem.Icon>
+                                    <Image Source="{StaticResource icon-load}"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
                             <MenuItem Header="Save"
                                       InputGestureText="Ctrl+S"
                                       Command="{x:Static local:MainWindow.RasterizeCommand}"
-                                      CommandParameter="s"/>
+                                      CommandParameter="s">
+                                <MenuItem.Icon>
+                                    <Image Source="{StaticResource icon-floppy}"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
                             <MenuItem Header="Save As">
+                                <MenuItem.Icon>
+                                    <Image Source="{StaticResource icon-floppy}" Opacity="0.6"/>
+                                </MenuItem.Icon>
                                 <MenuItem Header="PNG picture"
                                           Command="{x:Static local:MainWindow.RasterizeCommand}"
                                           CommandParameter="n.png"/>
@@ -44,14 +93,50 @@
                             </MenuItem>
                         </MenuItem>
                         <MenuItem Header="View">
+                            <MenuItem Header="Status bar"/>
                         </MenuItem>
                     </Menu>
                     <Separator/>
+                    <Button Command="{x:Static local:MainWindow.RasterizeCommand}"
+                            CommandParameter="s"
+                            ToolTip="Save"
+                            Style="{StaticResource DefaultButtonStyle}">
+                        <Button.Content>
+                            <Image Source="{StaticResource icon-floppy}"/>
+                        </Button.Content>
+                    </Button>
+                    <Separator/>
+                    <Button Command="{x:Static local:MainWindow.UndoCommand}"
+                            Style="{StaticResource DefaultButtonStyle}"
+                            ToolTip="Undo">
+                        <Button.Content>
+                            <Image Source="{StaticResource icon-undo}"/>
+                        </Button.Content>
+                    </Button>
+                    <Button Command="{x:Static local:MainWindow.RedoCommand}"
+                            Style="{StaticResource DefaultButtonStyle}"
+                            ToolTip="Redo">
+                        <Button.Content>
+                            <Image Source="{StaticResource icon-redo}"/>
+                        </Button.Content>
+                    </Button>
                 </ToolBar>
             </Fluent:Ribbon.Menu>
             <Fluent:RibbonTabItem>
-                <Fluent:RibbonGroupBox Header="Common">
-                    <Fluent:DropDownButton/>
+                <Fluent:RibbonGroupBox Header="Tools">
+                    <Fluent:RibbonGroupBox.Resources>
+                        <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="GroupName" Value="tools"/>
+                        </Style>
+                    </Fluent:RibbonGroupBox.Resources>
+                    <RadioButton Height="35">
+                        <Image Source="{StaticResource icon-pencil}"/>
+                    </RadioButton>
+                    <RadioButton Height="35">
+                        <Image Source="{StaticResource icon-magnifier}"/>
+                    </RadioButton>
                 </Fluent:RibbonGroupBox>
                 <Fluent:RibbonGroupBox Header="Shapes"/>
             </Fluent:RibbonTabItem>
@@ -65,12 +150,12 @@
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top"
                     RenderOptions.BitmapScalingMode="NearestNeighbor">
-                <view:ZoomableCanvas x:Name="canvas"
+                <canvas:CustomCanvas x:Name="canvas"
                         Canvas.Left="{Binding Source={x:Static local:MainWindow.EaselToCanvasMargin}}" 
                         Canvas.Top="{Binding Source={x:Static local:MainWindow.EaselToCanvasMargin}}"
                         Panel.ZIndex="10"
                         Background="White"
-                        Width="500px" Height="300px"
+                        Width="550" Height="325"
                         ClipToBounds="True"
                         RenderOptions.BitmapScalingMode="NearestNeighbor"/>
                 <Rectangle x:Name="rectPreviewResize"
