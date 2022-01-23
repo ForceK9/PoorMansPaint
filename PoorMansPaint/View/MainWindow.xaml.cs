@@ -74,7 +74,7 @@ namespace PoorMansPaint
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                canvas.StartDrawingAt(e.GetPosition(canvas));
+                canvas.DrawingTool.StartDrawingAt(e.GetPosition(canvas));
             }
         }
 
@@ -83,14 +83,14 @@ namespace PoorMansPaint
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 //Trace.WriteLine(e.GetPosition(this));
-                canvas.ContinueDrawingAt(e.GetPosition(canvas));
+                canvas.DrawingTool.ContinueDrawingAt(e.GetPosition(canvas));
             }
             base.OnMouseMove(e);
         }
 
         private void OnEaselMouseUp(object sender, MouseButtonEventArgs e)
         {
-            canvas.FinishDrawing();
+            canvas.DrawingTool.FinishDrawing();
         }
 
         private void OnEaselMouseWheel(object sender, MouseWheelEventArgs e)

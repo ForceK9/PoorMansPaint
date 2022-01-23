@@ -7,13 +7,13 @@ using System.Windows.Media;
 
 namespace PoorMansPaint.View.CustomCanvas
 {
-    public class DrawWithPencilCommand : UndoableCommand
+    public class DrawCommand : UndoableCommand
     {
         protected DrawingGroup _backup;
-        public PathGeometry PathToDraw { get; set; }
-        public DrawWithPencilCommand(PathGeometry pathToDraw)
+        public Geometry ThingToDraw { get; set; }
+        public DrawCommand(Geometry pathToDraw)
         {
-            PathToDraw = pathToDraw;
+            ThingToDraw = pathToDraw;
         }
         public override void Execute(CustomCanvas target)
         {
@@ -28,7 +28,7 @@ namespace PoorMansPaint.View.CustomCanvas
                         EndLineCap = PenLineCap.Round,
                         LineJoin = PenLineJoin.Round,
                     },
-                    PathToDraw));
+                    ThingToDraw));
             }
         }
         public override void Undo()
