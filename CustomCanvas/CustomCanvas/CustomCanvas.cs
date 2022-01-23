@@ -8,10 +8,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace PoorMansPaint.View.CustomCanvas
+namespace PoorMansPaint.CustomCanvas
 {
     // a canvas that is resizable, zoomable and operations on it are undoable
-    public class CustomCanvas : Canvas
+    public class CustomCanvas : System.Windows.Controls.Canvas
     {
         public static readonly double[] ZoomLevel = { 0.125, 0.25, 0.5, 0.75, 1, 2, 3, 4, 5, 6, 7, 8 };
         protected static int DEFAULT_ZOOM_INDEX = 4;
@@ -28,6 +28,7 @@ namespace PoorMansPaint.View.CustomCanvas
                 this.Cursor = _drawingTool.Cursor;
             }
         }
+        public Pen Pen { get; set; }
 
         private ScaleTransform GetCanvasScale()
         {
@@ -69,7 +70,12 @@ namespace PoorMansPaint.View.CustomCanvas
             SetZoomLevelIndex(DEFAULT_ZOOM_INDEX);
             this.DrawingGroup = new DrawingGroup();
             Commander = new CanvasCommander(this);
-            DrawingTool = new LineDrawingTool(this);
+            Pen = new Pen(Brushes.Black, 1)
+            {
+                StartLineCap = PenLineCap.Round,
+                EndLineCap = PenLineCap.Round,
+                LineJoin = PenLineJoin.Round,
+            };
         }
 
         protected override void OnInitialized(EventArgs e)
@@ -86,6 +92,11 @@ namespace PoorMansPaint.View.CustomCanvas
             DrawingGroup.Children.Add(backup);
             DrawingGroup.ClipGeometry = new RectangleGeometry(
                 new Rect(new Point(0, 0), new Point(Width, Height)));
+        }
+
+        public bool ContainsPoint(Point pos)
+        {
+            return pos.X >= 0 && pos.Y >= 0 && pos.X <= Width && pos.Y <= Height;
         }
 
         private void SetZoomLevelIndex(int idx)

@@ -7,26 +7,28 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Input;
 
-namespace PoorMansPaint.View.CustomCanvas
+namespace PoorMansPaint.CustomCanvas
 {
     // if you want to draw something on the drawing canvas (a pencil, some shapes, ...)
     // subclassing this class and put the .dll in the same directory as the executable
     // a support class for CustomCanvas
     public abstract class DrawingTool
     {
-        protected CustomCanvas _target;
-        public DrawingTool (CustomCanvas target)
+        protected CustomCanvas? _target;
+        public DrawingTool()
         {
-            _target = target;
+            _target = null;
         }
 
-        public bool IsPointInsideTarget(Point pos)
+        public virtual bool IsDrawing()
         {
-            return pos.X >= 0 && pos.Y >= 0 && pos.X <= _target.Width && pos.Y <= _target.Height;
+            return _target != null;
         }
+
+        public abstract string MagicWord { get; }
         public abstract object ButtonIcon { get; }
         public abstract Cursor Cursor { get; }
-        public abstract void StartDrawingAt(Point pos);
+        public abstract void StartDrawingAt(CustomCanvas target, Point pos);
         public abstract void ContinueDrawingAt(Point pos);
         public abstract void FinishDrawing();
     }

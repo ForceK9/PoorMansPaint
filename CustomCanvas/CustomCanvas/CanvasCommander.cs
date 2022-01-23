@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PoorMansPaint.View.CustomCanvas
+namespace PoorMansPaint.CustomCanvas
 {
     // Use this class to perform undoable commands on CustomCanvas
     public class CanvasCommander

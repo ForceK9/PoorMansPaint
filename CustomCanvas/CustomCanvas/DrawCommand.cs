@@ -5,15 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace PoorMansPaint.View.CustomCanvas
+namespace PoorMansPaint.CustomCanvas
 {
     public class DrawCommand : UndoableCommand
     {
         protected DrawingGroup _backup;
         public Geometry ThingToDraw { get; set; }
-        public DrawCommand(Geometry pathToDraw)
+        public Pen PenToDrawWith { get; set; }
+        public DrawCommand(Geometry pathToDraw, Pen pen)
         {
             ThingToDraw = pathToDraw;
+            PenToDrawWith = pen.Clone();
         }
         public override void Execute(CustomCanvas target)
         {
@@ -21,14 +23,8 @@ namespace PoorMansPaint.View.CustomCanvas
             _backup = target.DrawingGroup.Clone();
             using (DrawingContext dgdc = target.DrawingGroup.Append())
             {
-                target.DrawingGroup.Children.Add(new GeometryDrawing(null,
-                    new Pen(Brushes.Black, 1)
-                    {
-                        StartLineCap = PenLineCap.Round,
-                        EndLineCap = PenLineCap.Round,
-                        LineJoin = PenLineJoin.Round,
-                    },
-                    ThingToDraw));
+                target.DrawingGroup.Children.Add(new GeometryDrawing(
+                    null, PenToDrawWith, ThingToDraw));
             }
         }
         public override void Undo()

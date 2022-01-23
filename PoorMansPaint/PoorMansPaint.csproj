@@ -30,6 +30,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CustomCanvas\CustomCanvas.csproj" />
+    <ProjectReference Include="..\DrawingTools\DrawingTools.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Resources\icon-add.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>

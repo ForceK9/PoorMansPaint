@@ -5,30 +5,31 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace PoorMansPaint.View.CustomCanvas
+namespace PoorMansPaint.CustomCanvas
 {
     public abstract class ShapeDrawingTool : DrawingTool
     {
-        public override object ButtonIcon => null;
-
         public override Cursor Cursor => Cursors.Cross;
+        public abstract object ToolTipContent { get; }
 
-        protected GeometryGroup _shape;
+        protected GeometryGroup? _shape;
         protected Point? _startPoint;
 
-        protected ShapeDrawingTool(CustomCanvas target) : base(target)
+        protected ShapeDrawingTool()
         {
             _startPoint = null;
         }
 
         protected abstract Geometry CreateShape(Point StartPoint, Point EndPoint);
 
-        public override void StartDrawingAt(Point pos)
+        public override void StartDrawingAt(CustomCanvas target, Point pos)
         {
-            if (!IsPointInsideTarget(pos)) return;
+            if (!target.ContainsPoint(pos)) return;
+            _target = target;
             _startPoint = pos;
         }
 
@@ -38,7 +39,7 @@ namespace PoorMansPaint.View.CustomCanvas
             if (_shape == null)
             {
                 _shape = new GeometryGroup();
-                _target.Commander.Command(new DrawCommand(_shape));
+                _target.Commander.Command(new DrawCommand(_shape, _target.Pen));
             }
             _shape.Children.Clear();
             _shape.Children.Add(CreateShape((Point)_startPoint, pos));

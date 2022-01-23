@@ -1,8 +1,9 @@
-﻿using Microsoft.Win32;
-using PoorMansPaint.View.CustomCanvas;
+﻿using PoorMansPaint.CustomCanvas;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -18,11 +19,42 @@ namespace PoorMansPaint
     public partial class MainWindow : Window
     {
         public static readonly int EaselToCanvasMargin = 30;
+        public static Dictionary<string, DrawingTool> ToolPrototypes = null;
+
         public static readonly RoutedCommand RasterizeCommand = new RoutedCommand();
         public static readonly RoutedCommand UndoCommand = new RoutedCommand();
         public static readonly RoutedCommand RedoCommand = new RoutedCommand();
+        public static readonly RoutedCommand ChooseDrawingToolCommand = new RoutedCommand();
         private ImageEncoder encoder = new ImageEncoder();
-        
+
+        private static void CreateToolPrototypes()
+        {
+            ToolPrototypes = new Dictionary<string, DrawingTool>();
+
+            // search for .dll that have ShapeDrawingTool-derived classes
+            var exeFolder = AppDomain.CurrentDomain.BaseDirectory;
+            Trace.WriteLine(exeFolder);
+            var dlls = new DirectoryInfo(exeFolder).GetFiles("*.dll");
+
+            foreach (var dll in dlls)
+            {
+                var assembly = Assembly.LoadFile(dll.FullName);
+                var types = assembly.GetTypes();
+
+                foreach (Type type in types)
+                {
+                    if (type.IsClass)
+                    {
+                        if (type.IsSubclassOf(typeof(DrawingTool)))
+                        {
+                            var tool = Activator.CreateInstance(type) as DrawingTool;
+                            ToolPrototypes.Add(tool.MagicWord, tool);
+                        }
+                    }
+                }
+            }
+        }
+
         public MainWindow()
         {
             InitializeComponent();
@@ -48,10 +80,13 @@ namespace PoorMansPaint
             // zooming-related callbacks
             easel.MouseWheel += OnEaselMouseWheel;
 
-            // drawing callbacks
+            // drawing related stuff
             easel.MouseDown += OnEaselMouseDown;
             easel.MouseMove += OnEaselMouseMove;
             easel.MouseUp += OnEaselMouseUp;
+            if (ToolPrototypes == null) CreateToolPrototypes();
+            canvas.DrawingTool = ToolPrototypes["pencil"];
+            AddShapeDrawingToolButtons();
 
             // rasterize command
             CommandBindings.Add(new CommandBinding(
@@ -68,13 +103,36 @@ namespace PoorMansPaint
                 RedoCommand,
                 RedoCommand_Executed,
                 RedoCommand_CanExecute));
+
+            // select tool command
+            CommandBindings.Add(new CommandBinding(
+                ChooseDrawingToolCommand,
+                ChooseDrawingToolCommand_Executed,
+                ChooseDrawingToolCommand_CanExecute));
+        }
+
+        private void AddShapeDrawingToolButtons()
+        {
+            foreach (var item in ToolPrototypes)
+            {
+                var tool = item.Value as ShapeDrawingTool;
+                if (tool == null) continue;
+                var button = new RadioButton()
+                {
+                    Content = tool.ButtonIcon,
+                    ToolTip = new ToolTip() { Content = tool.ToolTipContent },
+                };
+                button.Command = ChooseDrawingToolCommand;
+                button.CommandParameter = tool.MagicWord;
+                shapesPanel.Children.Add(button);
+            }
         }
 
         private void OnEaselMouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                canvas.DrawingTool.StartDrawingAt(e.GetPosition(canvas));
+                canvas.DrawingTool.StartDrawingAt(canvas, e.GetPosition(canvas));
             }
         }
 
@@ -83,14 +141,20 @@ namespace PoorMansPaint
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 //Trace.WriteLine(e.GetPosition(this));
-                canvas.DrawingTool.ContinueDrawingAt(e.GetPosition(canvas));
+                if (canvas.DrawingTool.IsDrawing())
+                {
+                    canvas.DrawingTool.ContinueDrawingAt(e.GetPosition(canvas));
+                }
             }
             base.OnMouseMove(e);
         }
 
         private void OnEaselMouseUp(object sender, MouseButtonEventArgs e)
         {
-            canvas.DrawingTool.FinishDrawing();
+            if (canvas.DrawingTool.IsDrawing())
+            {
+                canvas.DrawingTool.FinishDrawing();
+            }
         }
 
         private void OnEaselMouseWheel(object sender, MouseWheelEventArgs e)
@@ -282,6 +346,20 @@ namespace PoorMansPaint
         private void RedoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             canvas.Commander.Redo();
+        }
+
+        private void ChooseDrawingToolCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void ChooseDrawingToolCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            string arg = (string)e.Parameter;
+            if (ToolPrototypes.ContainsKey(arg))
+            {
+                canvas.DrawingTool = ToolPrototypes[arg];
+            }
         }
     }
 }

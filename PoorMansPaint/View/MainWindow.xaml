@@ -3,10 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:PoorMansPaint"
-        xmlns:canvas="clr-namespace:PoorMansPaint.View.CustomCanvas"
+        xmlns:canvas="clr-namespace:PoorMansPaint.CustomCanvas;assembly=CustomCanvas"
         mc:Ignorable="d"
         Title="Poorman's Paint" Height="600" Width="1000"
         MinHeight="400" MinWidth="600" Loaded="Window_Loaded">
@@ -27,6 +28,7 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
+            <local:PenColorConverter x:Key="colorConverter"/>
         </ResourceDictionary>
     </Window.Resources>
     <Window.InputBindings>
@@ -38,6 +40,11 @@
         <KeyBinding Modifiers="Ctrl+Shift" Key="Z" 
                     Command="{x:Static local:MainWindow.RedoCommand}"/>
     </Window.InputBindings>
+    <Window.DataContext>
+        <Pen x:Name="pen" Brush="Black" 
+             StartLineCap="Round" LineJoin="Round"
+             EndLineCap="Round"/>
+    </Window.DataContext>
     <DockPanel LastChildFill="True">
         <Fluent:Ribbon DockPanel.Dock="Top"
                        Height="150"
@@ -132,7 +139,9 @@
                             <Setter Property="GroupName" Value="tools"/>
                         </Style>
                     </Fluent:RibbonGroupBox.Resources>
-                    <RadioButton Height="35" ToolTip="Pencil" IsChecked="True">
+                    <RadioButton Height="35" ToolTip="Pencil" IsChecked="True"
+                                 Command="{x:Static local:MainWindow.ChooseDrawingToolCommand}"
+                                 CommandParameter="pencil">
                         <Image Source="{StaticResource icon-pencil}"/>
                     </RadioButton>
                     <RadioButton Height="35" ToolTip="Magnifier">
@@ -156,13 +165,8 @@
                         </Style>
                     </Fluent:RibbonGroupBox.Resources>
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <WrapPanel Name="shapesPanel"
+                        <WrapPanel x:Name="shapesPanel"
                                    Width="200" Orientation="Horizontal">
-                            <RadioButton ToolTip="Line">
-                                <Line X1="1" Y1="1"
-                                      X2="16" Y2="16" 
-                                      Stroke="Black" StrokeThickness="1"/>
-                            </RadioButton>
                             <RadioButton ToolTip="Ellipse">
                                 <Ellipse Width="19" Height="16"
                                       Stroke="Black" StrokeThickness="1"/>
@@ -186,14 +190,28 @@
                         </Grid.RowDefinitions>
 
                         <ComboBox Grid.Column="1"
-                                  VerticalAlignment="Center">
+                                  VerticalAlignment="Center"
+                                  HorizontalContentAlignment="Right"
+                                  SelectedValue="{Binding ElementName=canvas, Path=Pen.Thickness}">
+                            <sys:Double>1</sys:Double>
+                            <sys:Double>2</sys:Double>
+                            <sys:Double>3</sys:Double>
+                            <sys:Double>4</sys:Double>
+                            <sys:Double>5</sys:Double>
+                            <sys:Double>6</sys:Double>
+                            <sys:Double>7</sys:Double>
+                            <sys:Double>8</sys:Double>
+                            <sys:Double>9</sys:Double>
+                            <sys:Double>10</sys:Double>
+                            <sys:Double>11</sys:Double>
+                            <sys:Double>12</sys:Double>
                         </ComboBox>
                         <TextBlock Text="Size" VerticalAlignment="Center" 
                                    Margin="0,0,8,0"
                                    TextAlignment="Right"/>
                         <xctk:ColorPicker Grid.Column="1" Grid.Row="1"
                                           VerticalAlignment="Center"
-                                          SelectedColor="Black"
+                                          SelectedColor="{Binding ElementName=canvas, Path=Pen.Brush, Converter={StaticResource colorConverter}}"
                                           DisplayColorAndName="True"/>
                         <TextBlock Grid.Row="1"
                                    Text="Color" VerticalAlignment="Center" 
