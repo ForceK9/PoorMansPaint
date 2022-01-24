@@ -18,7 +18,26 @@ namespace PoorMansPaint.CustomCanvas
         protected int currentZoomIdx;
         public event SizeChangedEventHandler ZoomLevelChanged;
 
-        public DrawingGroup DrawingGroup { get; set; }
+        private DrawingGroup _drawingGroup;
+        public DrawingGroup DrawingGroup
+        {
+            get { return _drawingGroup; }
+            set
+            {
+                _drawingGroup = value;
+                if (value.ClipGeometry != null)
+                {
+                    Width = value.ClipGeometry.Bounds.Width;
+                    Height = value.ClipGeometry.Bounds.Height;
+                }
+                else
+                {
+                    Width = value.Bounds.Width;
+                    Height = value.Bounds.Height;
+                }
+                InvalidateVisual();
+            }
+        }
         private DrawingTool _drawingTool;
         public DrawingTool DrawingTool { 
             get { return _drawingTool; }
@@ -68,7 +87,7 @@ namespace PoorMansPaint.CustomCanvas
             LayoutTransform = scale;
             ZoomLevelChanged += UpdateZoom;
             SetZoomLevelIndex(DEFAULT_ZOOM_INDEX);
-            this.DrawingGroup = new DrawingGroup();
+            _drawingGroup = new DrawingGroup(); 
             Commander = new CanvasCommander(this);
             Pen = new Pen(Brushes.Black, 1)
             {
@@ -84,15 +103,30 @@ namespace PoorMansPaint.CustomCanvas
             AddClipping();
         }
 
+        protected override void OnRender(DrawingContext dc)
+        {
+            base.OnRender(dc);
+            dc.DrawDrawing(_drawingGroup);
+        }
+
         public void AddClipping()
         {
             // create clipping
-            DrawingGroup backup = this.DrawingGroup;
-            DrawingGroup = new DrawingGroup();
-            DrawingGroup.Children.Add(backup);
-            DrawingGroup.ClipGeometry = new RectangleGeometry(
+            if (_drawingGroup.Children.Count > 0)
+            {
+                DrawingGroup backup = this.DrawingGroup;
+                _drawingGroup = new DrawingGroup();
+                _drawingGroup.Children.Add(backup);
+            }
+            _drawingGroup.ClipGeometry = new RectangleGeometry(
                 new Rect(new Point(0, 0), new Point(Width, Height)));
         }
+
+        public bool IsModified()
+        {
+            return Commander.IsUndoingPossible();
+        }
+
 
         public bool ContainsPoint(Point pos)
         {
@@ -123,11 +157,19 @@ namespace PoorMansPaint.CustomCanvas
             if (currentZoomIdx > 0) 
                 SetZoomLevelIndex(currentZoomIdx - 1);
         }
-        protected override void OnRender(DrawingContext dc)
+
+        public void Reset()
         {
-            base.OnRender(dc);
-            dc.DrawDrawing(DrawingGroup);
-        } 
+            _drawingGroup.Children.Clear();
+            Commander.ClearHistory();
+            InvalidateVisual();
+        }
+
+        public void Load (DrawingGroup drawing)
+        {
+            Reset();
+            DrawingGroup = drawing;
+        }
 
         public Point GetRoundedPoint(Point p)
         {

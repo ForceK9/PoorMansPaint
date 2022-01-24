@@ -32,8 +32,14 @@
         </ResourceDictionary>
     </Window.Resources>
     <Window.InputBindings>
+        <KeyBinding Modifiers="Ctrl" Key="N" 
+                    Command="{x:Static local:MainWindow.SaveLoadCommand}"
+                    CommandParameter="n"/>
+        <KeyBinding Modifiers="Ctrl" Key="O" 
+                    Command="{x:Static local:MainWindow.SaveLoadCommand}"
+                    CommandParameter="o"/>
         <KeyBinding Modifiers="Ctrl" Key="S" 
-                    Command="{x:Static local:MainWindow.RasterizeCommand}"
+                    Command="{x:Static local:MainWindow.SaveLoadCommand}"
                     CommandParameter="s"/>
         <KeyBinding Modifiers="Ctrl" Key="Z" 
                     Command="{x:Static local:MainWindow.UndoCommand}"/>
@@ -60,44 +66,48 @@
                     <Menu Background="Transparent">
                         <MenuItem Header="File">
                             <MenuItem Header="New"
-                                      InputGestureText="Ctrl+N">
+                                      InputGestureText="Ctrl+N"
+                                      Command="{x:Static local:MainWindow.SaveLoadCommand}"
+                                      CommandParameter="n">
                                 <MenuItem.Icon>
                                     <Image Source="{StaticResource icon-file}"/>
                                 </MenuItem.Icon>
                             </MenuItem>
                             <MenuItem Header="Open"
-                                      InputGestureText="Ctrl+O">
+                                      InputGestureText="Ctrl+O"
+                                      Command="{x:Static local:MainWindow.SaveLoadCommand}"
+                                      CommandParameter="o">
                                 <MenuItem.Icon>
                                     <Image Source="{StaticResource icon-load}"/>
                                 </MenuItem.Icon>
                             </MenuItem>
                             <MenuItem Header="Save"
                                       InputGestureText="Ctrl+S"
-                                      Command="{x:Static local:MainWindow.RasterizeCommand}"
+                                      Command="{x:Static local:MainWindow.SaveLoadCommand}"
                                       CommandParameter="s">
                                 <MenuItem.Icon>
                                     <Image Source="{StaticResource icon-floppy}"/>
                                 </MenuItem.Icon>
                             </MenuItem>
-                            <MenuItem Header="Save As">
+                            <MenuItem Header="Export to">
                                 <MenuItem.Icon>
-                                    <Image Source="{StaticResource icon-floppy}" Opacity="0.6"/>
+                                    <Image Source="{StaticResource icon-export}"/>
                                 </MenuItem.Icon>
                                 <MenuItem Header="PNG picture"
-                                          Command="{x:Static local:MainWindow.RasterizeCommand}"
-                                          CommandParameter="n.png"/>
+                                          Command="{x:Static local:MainWindow.SaveLoadCommand}"
+                                          CommandParameter="e.png"/>
                                 <MenuItem Header="JPEG picture"
-                                          Command="{x:Static local:MainWindow.RasterizeCommand}"
-                                          CommandParameter="n.jpeg"/>
+                                          Command="{x:Static local:MainWindow.SaveLoadCommand}"
+                                          CommandParameter="e.jpeg"/>
                                 <MenuItem Header="BMP picture"
-                                          Command="{x:Static local:MainWindow.RasterizeCommand}"
-                                          CommandParameter="n.bmp"/>
+                                          Command="{x:Static local:MainWindow.SaveLoadCommand}"
+                                          CommandParameter="e.bmp"/>
                                 <MenuItem Header="GIF picture"
-                                          Command="{x:Static local:MainWindow.RasterizeCommand}"
-                                          CommandParameter="n.gif"/>
+                                          Command="{x:Static local:MainWindow.SaveLoadCommand}"
+                                          CommandParameter="e.gif"/>
                                 <MenuItem Header="Other format"
-                                          Command="{x:Static local:MainWindow.RasterizeCommand}"
-                                          CommandParameter="n"/>
+                                          Command="{x:Static local:MainWindow.SaveLoadCommand}"
+                                          CommandParameter="e"/>
                             </MenuItem>
                         </MenuItem>
                         <MenuItem Header="View">
@@ -105,7 +115,7 @@
                         </MenuItem>
                     </Menu>
                     <Separator/>
-                    <Button Command="{x:Static local:MainWindow.RasterizeCommand}"
+                    <Button Command="{x:Static local:MainWindow.SaveLoadCommand}"
                             CommandParameter="s"
                             ToolTip="Save"
                             Style="{StaticResource DefaultButtonStyle}">

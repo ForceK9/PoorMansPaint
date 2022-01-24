@@ -21,11 +21,11 @@ namespace PoorMansPaint
         public static readonly int EaselToCanvasMargin = 30;
         public static Dictionary<string, DrawingTool> ToolPrototypes = null;
 
-        public static readonly RoutedCommand RasterizeCommand = new RoutedCommand();
+        public static readonly RoutedCommand SaveLoadCommand = new RoutedCommand();
         public static readonly RoutedCommand UndoCommand = new RoutedCommand();
         public static readonly RoutedCommand RedoCommand = new RoutedCommand();
         public static readonly RoutedCommand ChooseDrawingToolCommand = new RoutedCommand();
-        private ImageEncoder encoder = new ImageEncoder();
+        private DrawingSaverLoader saverLoader;
 
         private static void CreateToolPrototypes()
         {
@@ -90,9 +90,9 @@ namespace PoorMansPaint
 
             // rasterize command
             CommandBindings.Add(new CommandBinding(
-                RasterizeCommand,
-                RasterizeCommand_Executed,
-                RasterizeCommand_CanExecute));
+                SaveLoadCommand,
+                SaveLoadCommand_Executed,
+                SaveLoadCommand_CanExecute));
 
             // undo redo commands
             CommandBindings.Add(new CommandBinding(
@@ -109,6 +109,9 @@ namespace PoorMansPaint
                 ChooseDrawingToolCommand,
                 ChooseDrawingToolCommand_Executed,
                 ChooseDrawingToolCommand_CanExecute));
+
+            // saving and loading
+            saverLoader = new DrawingSaverLoader(this);
         }
 
         private void AddShapeDrawingToolButtons()
@@ -300,27 +303,33 @@ namespace PoorMansPaint
             rectPreviewResize.Visibility = Visibility.Hidden;
         }
 
-        private void RasterizeCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void SaveLoadCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = true;
+            char command = ((string)e.Parameter)[0];
+            if (command.Equals('s')) e.CanExecute = saverLoader.CanBeSaved();
+            else e.CanExecute = true;
         }
 
         // https://docs.microsoft.com/en-us/dotnet/desktop/wpf/graphics-multimedia/imaging-overview?view=netframeworkdesktop-4.8
-        private void RasterizeCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void SaveLoadCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            BitmapSource bmp = canvas.CreateBitmap();
-
             // open SaveFileDialog and save bitmap to file
             string parameter = (string)e.Parameter;
             char command = parameter[0];
             string extension = parameter.Substring(1);
             switch (command)
             {
-                case 's':
-                    encoder.Save(bmp);
-                    break;
                 case 'n':
-                    encoder.SaveToNewFile(bmp, extension);
+                    saverLoader.New();
+                    break;
+                case 'o':
+                    saverLoader.Load();
+                    break;
+                case 's':
+                    saverLoader.Save();
+                    break;
+                case 'e':
+                    saverLoader.ExportToNewFile(extension);
                     break;
                 default:
                     throw new InvalidOperationException("Command: " + command);

@@ -65,5 +65,11 @@ namespace PoorMansPaint.CustomCanvas
             _normalHistory.Push(lastCommand);
             lastCommand.Execute(Target);
         }
+
+        public void ClearHistory()
+        {
+            _normalHistory.Clear();
+            _undoneHistory.Clear();
+        }
     }
 }

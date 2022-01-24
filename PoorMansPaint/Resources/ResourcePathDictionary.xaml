@@ -14,4 +14,5 @@
     <ImageSource x:Key="icon-redo">/Resources/icon-redo.png</ImageSource>
     <ImageSource x:Key="icon-pencil">/Resources/icon-pencil.png</ImageSource>
     <ImageSource x:Key="icon-magnifier">/Resources/icon-magnifier.png</ImageSource>
+    <ImageSource x:Key="icon-export">/Resources/icon-export.png</ImageSource>
 </ResourceDictionary>

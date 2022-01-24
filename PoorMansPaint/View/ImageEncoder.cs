@@ -15,13 +15,6 @@ namespace PoorMansPaint
         public static readonly Dictionary<string, EncoderFactory> Prototypes = new Dictionary<string, EncoderFactory>();
         public static readonly string Filter;
 
-        private string? _path; 
-
-        public static BitmapEncoder CreatePngEncoder()
-        {
-            return new PngBitmapEncoder();
-        }
-
         static ImageEncoder()
         {
             StringBuilder builder = new StringBuilder();
@@ -72,57 +65,22 @@ namespace PoorMansPaint
             // finalize
             Filter = builder.ToString();
         }
-        public ImageEncoder() { }
 
-        public void Reset()
+        public static bool CanEncodeThisFormat(string extension)
         {
-            _path = null;
+            return Prototypes.ContainsKey(extension);
         }
 
-        public bool Save (BitmapSource bmp)
-        {
-            if (_path == null)
-            {
-                // first time saving, ask for filename
-                return SaveToNewFile(bmp);
-            }
-            EncodeBitmap(bmp);
-            return true;
-        }
-
-        public bool SaveToNewFile (BitmapSource bmp, string? chosenExtension = null)
-        {
-            if (!AskForFileName(chosenExtension)) return false;
-            EncodeBitmap(bmp);
-            return true;
-        }
-
-        protected bool AskForFileName(string? chosenExtension = null)
-        {
-            // ask for save path and image type
-            SaveFileDialog dialog = new SaveFileDialog();
-            dialog.Filter = ImageEncoder.Filter;
-            dialog.AddExtension = true;
-            dialog.FileName = "Untitled";
-            dialog.FilterIndex = chosenExtension != null && FilterIndexes.ContainsKey(chosenExtension) ?
-                FilterIndexes[chosenExtension] : 1; // index is 1-based ... why?
-            //Trace.WriteLine(dialog.FilterIndex);
-            if (dialog.ShowDialog() == false) return false;
-
-            _path = dialog.FileName;
-            return true;
-        }
-
-        protected void EncodeBitmap (BitmapSource bmp)
+        public static void EncodeBitmap (BitmapSource bmp, string fileName)
         {
             // get correct encoder from the list of prototypes
-            string extension = _path.Substring(_path.LastIndexOf('.'));
+            string extension = fileName.Substring(fileName.LastIndexOf('.'));
             if (!Prototypes.ContainsKey(extension))
                 throw new NullReferenceException(extension);
             BitmapEncoder encoder = Prototypes[extension].Invoke();
 
             // use encoder to save bitmap to image
-            FileStream stream = new FileStream(_path, FileMode.Create);
+            FileStream stream = new FileStream(fileName, FileMode.Create);
             encoder.Frames.Add(BitmapFrame.Create(bmp));
             encoder.Save(stream);
             stream.Close();

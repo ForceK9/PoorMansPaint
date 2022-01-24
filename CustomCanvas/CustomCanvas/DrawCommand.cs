@@ -31,7 +31,6 @@ namespace PoorMansPaint.CustomCanvas
         {
             base.Undo();
             _target.DrawingGroup = _backup;
-            _target.InvalidateVisual();
         }
     }
 }

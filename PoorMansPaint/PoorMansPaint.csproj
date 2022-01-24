@@ -12,6 +12,7 @@
     <None Remove="Resources\icon-arrow-down.png" />
     <None Remove="Resources\icon-arrow-right.png" />
     <None Remove="Resources\icon-arrow-up.png" />
+    <None Remove="Resources\icon-export.png" />
     <None Remove="Resources\icon-file.png" />
     <None Remove="Resources\icon-floppy.png" />
     <None Remove="Resources\icon-info.png" />
@@ -45,6 +46,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\icon-arrow-up.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\icon-export.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\icon-file.png">
