@@ -23,6 +23,7 @@
     <None Remove="Resources\icon-sort.png" />
     <None Remove="Resources\icon-trash.png" />
     <None Remove="Resources\icon-undo.png" />
+    <None Remove="View\DrawingSaverLoader.cs~RF867cc2b.TMP" />
   </ItemGroup>
 
   <ItemGroup>

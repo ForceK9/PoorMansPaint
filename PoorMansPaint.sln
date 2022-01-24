@@ -5,9 +5,11 @@ VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PoorMansPaint", "PoorMansPaint\PoorMansPaint.csproj", "{72670990-4461-4593-8253-BBE9F5BB60E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomCanvas", "CustomCanvas\CustomCanvas.csproj", "{71643733-B1CF-4DD9-8D52-A8EABD3EB0AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomCanvas", "CustomCanvas\CustomCanvas.csproj", "{71643733-B1CF-4DD9-8D52-A8EABD3EB0AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawingTools", "DrawingTools\DrawingTools.csproj", "{32B5BD7C-B5B8-4EC1-BAA5-7CE38B909802}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DrawingTools", "DrawingTools\DrawingTools.csproj", "{32B5BD7C-B5B8-4EC1-BAA5-7CE38B909802}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RhombusDrawingTool", "RhombusDrawingTool\RhombusDrawingTool.csproj", "{BC981F5A-D401-4C79-9C60-3FB8AA71AC95}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{32B5BD7C-B5B8-4EC1-BAA5-7CE38B909802}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32B5BD7C-B5B8-4EC1-BAA5-7CE38B909802}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32B5BD7C-B5B8-4EC1-BAA5-7CE38B909802}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC981F5A-D401-4C79-9C60-3FB8AA71AC95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC981F5A-D401-4C79-9C60-3FB8AA71AC95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC981F5A-D401-4C79-9C60-3FB8AA71AC95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC981F5A-D401-4C79-9C60-3FB8AA71AC95}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

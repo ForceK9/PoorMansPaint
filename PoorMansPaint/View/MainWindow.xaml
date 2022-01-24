@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent"
-        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" 
         xmlns:local="clr-namespace:PoorMansPaint"
         xmlns:canvas="clr-namespace:PoorMansPaint.CustomCanvas;assembly=CustomCanvas"
         mc:Ignorable="d"
@@ -176,16 +176,7 @@
                     </Fluent:RibbonGroupBox.Resources>
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <WrapPanel x:Name="shapesPanel"
-                                   Width="200" Orientation="Horizontal">
-                            <RadioButton ToolTip="Ellipse">
-                                <Ellipse Width="19" Height="16"
-                                      Stroke="Black" StrokeThickness="1"/>
-                            </RadioButton>
-                            <RadioButton ToolTip="Rectangle">
-                                <Rectangle Width="18" Height="15"
-                                           Stroke="Black" StrokeThickness="1"/>
-                            </RadioButton>
-                        </WrapPanel>
+                                   Width="200" Orientation="Horizontal"/>
                     </ScrollViewer>
                 </Fluent:RibbonGroupBox>
                 <Fluent:RibbonGroupBox Header="Options">
@@ -205,16 +196,12 @@
                                   SelectedValue="{Binding ElementName=canvas, Path=Pen.Thickness}">
                             <sys:Double>1</sys:Double>
                             <sys:Double>2</sys:Double>
-                            <sys:Double>3</sys:Double>
                             <sys:Double>4</sys:Double>
-                            <sys:Double>5</sys:Double>
-                            <sys:Double>6</sys:Double>
-                            <sys:Double>7</sys:Double>
                             <sys:Double>8</sys:Double>
-                            <sys:Double>9</sys:Double>
-                            <sys:Double>10</sys:Double>
-                            <sys:Double>11</sys:Double>
                             <sys:Double>12</sys:Double>
+                            <sys:Double>16</sys:Double>
+                            <sys:Double>24</sys:Double>
+                            <sys:Double>32</sys:Double>
                         </ComboBox>
                         <TextBlock Text="Size" VerticalAlignment="Center" 
                                    Margin="0,0,8,0"
