@@ -16,7 +16,8 @@ namespace PoorMansPaint
     // support class for MainWindow that handles saving and loading
     public class DrawingSaverLoader
     {
-        public static readonly string XamlFilter = "Paint project (*.xaml)|*.xaml";
+        public static readonly string PaintProjectExtension = ".paint";
+        public static readonly string XamlFilter = $"Paint project (*{PaintProjectExtension})|*{PaintProjectExtension}";
         public MainWindow Window { get; }
         public string Filter { 
             get
@@ -64,7 +65,7 @@ namespace PoorMansPaint
 
             // get the correct encoder
             string extension = file.Substring(file.LastIndexOf('.'));
-            if (extension.Equals(".xaml")) SaveToXaml(file);
+            if (extension.Equals(PaintProjectExtension)) SaveToXaml(file);
             else if (ImageEncoder.CanEncodeThisFormat(extension))
             {
                 BitmapSource bmp = Window.canvas.CreateBitmap();
@@ -179,9 +180,9 @@ namespace PoorMansPaint
                 Window.canvas.Load(drawing);
                 savedXamlString = XamlWriter.Save(drawing);
             }
-            catch (FileNotFoundException)
+            catch (Exception e)
             {
-                MessageBox.Show("Cannot open file", Window.Title, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Error opening and parsing Paint project. The file may be corrupted or in a wrong format.", Window.Title, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
         }
