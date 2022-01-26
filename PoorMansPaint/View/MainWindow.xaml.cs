@@ -21,6 +21,7 @@ namespace PoorMansPaint
         public static readonly int EaselToCanvasMargin = 30;
         public static Dictionary<string, DrawingTool> ToolPrototypes = null;
 
+        public static readonly RoutedCommand ZoomCommand = new RoutedCommand();
         public static readonly RoutedCommand SaveLoadCommand = new RoutedCommand();
         public static readonly RoutedCommand UndoCommand = new RoutedCommand();
         public static readonly RoutedCommand RedoCommand = new RoutedCommand();
@@ -33,7 +34,7 @@ namespace PoorMansPaint
 
             // search for .dll that have ShapeDrawingTool-derived classes
             var exeFolder = AppDomain.CurrentDomain.BaseDirectory;
-            Trace.WriteLine(exeFolder);
+            //Trace.WriteLine(exeFolder);
             var dlls = new DirectoryInfo(exeFolder).GetFiles("*.dll");
 
             foreach (var dll in dlls)
@@ -79,6 +80,10 @@ namespace PoorMansPaint
 
             // zooming-related callbacks
             easel.MouseWheel += OnEaselMouseWheel;
+            CommandBindings.Add(new CommandBinding(
+                ZoomCommand,
+                ZoomCommand_Executed,
+                ZoomCommand_CanExecute));
 
             // drawing related stuff
             easel.MouseDown += OnEaselMouseDown;
@@ -87,6 +92,7 @@ namespace PoorMansPaint
             if (ToolPrototypes == null) CreateToolPrototypes();
             canvas.DrawingTool = ToolPrototypes["pencil"];
             AddShapeDrawingToolButtons();
+
 
             // rasterize command
             CommandBindings.Add(new CommandBinding(
@@ -112,6 +118,7 @@ namespace PoorMansPaint
 
             // saving and loading
             saverLoader = new DrawingSaverLoader(this);
+
         }
 
         private void AddShapeDrawingToolButtons()
@@ -141,14 +148,21 @@ namespace PoorMansPaint
 
         private void OnEaselMouseMove(object sender, MouseEventArgs e)
         {
+            Point pos = e.GetPosition(canvas);
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 //Trace.WriteLine(e.GetPosition(this));
                 if (canvas.DrawingTool.IsDrawing())
                 {
-                    canvas.DrawingTool.ContinueDrawingAt(e.GetPosition(canvas));
+                    canvas.DrawingTool.ContinueDrawingAt(pos);
                 }
             }
+
+            // update text on the status bar
+            pos = canvas.GetRoundedPoint(pos);
+            if (canvas.ContainsPoint(pos))
+                txtMousePosOnCanvas.Text = $"{pos.X} x {pos.Y} dp ";
+            else txtMousePosOnCanvas.Text = "";
             base.OnMouseMove(e);
         }
 
@@ -165,24 +179,20 @@ namespace PoorMansPaint
             // ctrl + mouse wheel to zoom
             if (Keyboard.Modifiers != ModifierKeys.Control) return;
             Point point = e.GetPosition(easel);
-            Trace.WriteLine(point);
+            //Trace.WriteLine(point);
             if (e.Delta > 0)
             {
-                // mouse wheel rotate down, zoom in
-                canvas.ZoomOut();
+                // mouse wheel rotate up, zoom in
+                ZoomCommand.Execute("in", null);
             }
             else
             {
-                // mouse wheel rotate up, zoom out
-                canvas.ZoomIn();
+                // mouse wheel rotate down, zoom out
+                ZoomCommand.Execute("out", null);
             }
 
-            //Trace.WriteLine(e.GetPosition(easel));
-            //Trace.WriteLine("------------");
             viewer.ScrollToHorizontalOffset(point.X - viewer.ViewportWidth / 2 / canvas.CurrentZoom);
             viewer.ScrollToVerticalOffset(point.Y - viewer.ViewportHeight / 2 / canvas.CurrentZoom);
-            //Trace.WriteLine((point.X - viewer.ViewportWidth / 2 / canvas.CurrentZoom) + "," + (point.Y - viewer.ViewportHeight / 2 / canvas.CurrentZoom));
-            //Trace.WriteLine(viewer.ContentHorizontalOffset + "," + viewer.ContentVerticalOffset);
             e.Handled = true;
         }
 
@@ -233,6 +243,9 @@ namespace PoorMansPaint
 
             // resize the easel to keep it a certain margin away from the canvas
             RecalculateEaselSize();
+
+            rectPreviewResize.Width = canvas.RealWidth + 2;
+            rectPreviewResize.Height = canvas.RealHeight + 2;
         }
 
         private void OnResizeThumbDragStarted(object sender, DragStartedEventArgs e)
@@ -303,6 +316,23 @@ namespace PoorMansPaint
             rectPreviewResize.Visibility = Visibility.Hidden;
         }
 
+        private void ZoomCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            string parameter = (string)e.Parameter;
+            if (parameter.Equals("in"))
+                e.CanExecute = !(canvas.CurrentZoomIndex >= CustomCanvas.CustomCanvas.ZoomLevel.Length - 1);
+            if (parameter.Equals("out"))
+                e.CanExecute = !(canvas.CurrentZoomIndex <= 0);
+
+        }
+
+        private void ZoomCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            string parameter = (string)e.Parameter;
+            if (parameter.Equals("in")) canvas.ZoomIn();
+            if (parameter.Equals("out")) canvas.ZoomOut();
+        }
+
         private void SaveLoadCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             char command = ((string)e.Parameter)[0];
@@ -368,6 +398,21 @@ namespace PoorMansPaint
             if (ToolPrototypes.ContainsKey(arg))
             {
                 canvas.DrawingTool = ToolPrototypes[arg];
+            }
+        }
+
+        private void ToggleStatusBar(object sender, RoutedEventArgs e)
+        {
+            MenuItem menuItem = (MenuItem)sender;
+            if (statusBar.Visibility == Visibility.Visible)
+            {
+                statusBar.Visibility = Visibility.Collapsed;
+                ((Image)menuItem.Icon).Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                statusBar.Visibility = Visibility.Visible;
+                ((Image)menuItem.Icon).Visibility = Visibility.Visible;
             }
         }
     }

@@ -29,6 +29,9 @@
                 </Style.Triggers>
             </Style>
             <local:PenColorConverter x:Key="colorConverter"/>
+            <local:CanvasSizeConverter x:Key="canvasSizeConverter"/>
+            <local:ZoomIndexConverter x:Key="zoomIndexConverter"/>
+            <local:ZoomLevelConverter x:Key="zoomLevelConverter"/>
         </ResourceDictionary>
     </Window.Resources>
     <Window.InputBindings>
@@ -46,11 +49,6 @@
         <KeyBinding Modifiers="Ctrl+Shift" Key="Z" 
                     Command="{x:Static local:MainWindow.RedoCommand}"/>
     </Window.InputBindings>
-    <Window.DataContext>
-        <Pen x:Name="pen" Brush="Black" 
-             StartLineCap="Round" LineJoin="Round"
-             EndLineCap="Round"/>
-    </Window.DataContext>
     <DockPanel LastChildFill="True">
         <Fluent:Ribbon DockPanel.Dock="Top"
                        Height="150"
@@ -111,7 +109,12 @@
                             </MenuItem>
                         </MenuItem>
                         <MenuItem Header="View">
-                            <MenuItem Header="Status bar"/>
+                            <MenuItem Header="Status bar"
+                                      Click="ToggleStatusBar">
+                                <MenuItem.Icon>
+                                    <Image Source="{StaticResource Fluent.Ribbon.Images.Checked}"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
                         </MenuItem>
                     </Menu>
                     <Separator/>
@@ -219,6 +222,75 @@
                 </Fluent:RibbonGroupBox>
             </Fluent:RibbonTabItem>
         </Fluent:Ribbon>
+        <StatusBar x:Name="statusBar"
+                   DockPanel.Dock="Bottom"
+                   Height="25"
+                   Visibility="Visible">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="150" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="{StaticResource icon-cursor}" Margin="5,0,5,0"/>
+                    <TextBlock x:Name="txtMousePosOnCanvas"/> 
+                </StackPanel>
+            </StatusBarItem>
+            <Separator Grid.Column="1"/>
+            <StatusBarItem Grid.Column="2">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="{StaticResource icon-fullscreen}" Margin="5,0,5,0"/>
+                    <TextBlock x:Name="txtCanvasSize">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource canvasSizeConverter}"
+                                          Mode="OneWay">
+                                <Binding ElementName="canvas" Path="CurrentZoom"
+                                         Mode="OneWay"/>
+                                <Binding ElementName="rectPreviewResize" Path="Width"
+                                         Mode="OneWay"/>
+                                <Binding ElementName="rectPreviewResize" Path="Height"
+                                         Mode="OneWay"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </StackPanel>
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="3"
+                           HorizontalContentAlignment="Right">
+                <DockPanel LastChildFill="false">
+                    <Button DockPanel.Dock="Right" 
+                            Style="{StaticResource DefaultButtonStyle}"
+                            Background="Transparent" BorderThickness="0"
+                            Command="{x:Static local:MainWindow.ZoomCommand}"
+                            CommandParameter="in">
+                        <Image Source="{StaticResource icon-add}"/>
+                    </Button>
+                    <Slider DockPanel.Dock="Right" 
+                            Width="150"
+                            Minimum="1" 
+                            Maximum="{Binding Source={x:Static canvas:CustomCanvas.ZoomLevel}, Path=Length}"
+                            IsSnapToTickEnabled="True"
+                            Value="{Binding Mode=TwoWay, ElementName=canvas, Path=CurrentZoomIndex, Converter={StaticResource zoomIndexConverter}}"/>
+                    <Button DockPanel.Dock="Right" 
+                            Style="{StaticResource DefaultButtonStyle}"
+                            Background="Transparent" BorderThickness="0"
+                            Command="{x:Static local:MainWindow.ZoomCommand}"
+                            CommandParameter="out">
+                        <Image Source="{StaticResource icon-minus}"/>
+                    </Button>
+                    <TextBlock Text="{Binding Mode=OneWay,ElementName=canvas, Path=CurrentZoom, Converter={StaticResource zoomLevelConverter}}"
+                               Margin="0,0,5,0"/>
+                </DockPanel>
+            </StatusBarItem>
+        </StatusBar>
         <ScrollViewer x:Name="viewer"
                       ClipToBounds="True"
                       VerticalScrollBarVisibility="Auto"
@@ -243,9 +315,6 @@
                            Width="500" Height="300"
                            Panel.ZIndex="15"
                            Visibility="Hidden"/>
-                <Path x:Name="previewDrawing"
-                      Visibility="Hidden">
-                </Path>
                 <Thumb x:Name="thumbHorizontal"
                        Panel.ZIndex="5"
                        Style="{StaticResource ResizeThumbTemplate}"

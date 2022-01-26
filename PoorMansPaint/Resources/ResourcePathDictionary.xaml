@@ -15,4 +15,8 @@
     <ImageSource x:Key="icon-pencil">/Resources/icon-pencil.png</ImageSource>
     <ImageSource x:Key="icon-magnifier">/Resources/icon-magnifier.png</ImageSource>
     <ImageSource x:Key="icon-export">/Resources/icon-export.png</ImageSource>
+    <ImageSource x:Key="icon-cursor">/Resources/icon-cursor.png</ImageSource>
+    <ImageSource x:Key="icon-fullscreen">/Resources/icon-fullscreen.png</ImageSource>
+    <ImageSource x:Key="icon-minus">/Resources/icon-minus.png</ImageSource>
+    <ImageSource x:Key="icon-check">/Resources/icon-check.png</ImageSource>
 </ResourceDictionary>

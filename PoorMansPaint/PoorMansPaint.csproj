@@ -12,12 +12,16 @@
     <None Remove="Resources\icon-arrow-down.png" />
     <None Remove="Resources\icon-arrow-right.png" />
     <None Remove="Resources\icon-arrow-up.png" />
+    <None Remove="Resources\icon-check.png" />
+    <None Remove="Resources\icon-cursor.png" />
     <None Remove="Resources\icon-export.png" />
     <None Remove="Resources\icon-file.png" />
     <None Remove="Resources\icon-floppy.png" />
+    <None Remove="Resources\icon-fullscreen.png" />
     <None Remove="Resources\icon-info.png" />
     <None Remove="Resources\icon-load.png" />
     <None Remove="Resources\icon-magnifier.png" />
+    <None Remove="Resources\icon-minus.png" />
     <None Remove="Resources\icon-pencil.png" />
     <None Remove="Resources\icon-redo.png" />
     <None Remove="Resources\icon-sort.png" />
@@ -49,6 +53,12 @@
     <Resource Include="Resources\icon-arrow-up.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Resources\icon-check.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\icon-cursor.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\icon-export.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
@@ -58,6 +68,9 @@
     <Resource Include="Resources\icon-floppy.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Resources\icon-fullscreen.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\icon-info.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
@@ -65,6 +78,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\icon-magnifier.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\icon-minus.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\icon-pencil.png">

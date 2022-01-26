@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 namespace PoorMansPaint
 {
     // support class for MainWindow that handles saving and loading
-    public class DrawingSaverLoader
+    public sealed class DrawingSaverLoader
     {
         public static readonly string PaintProjectExtension = ".paint";
         public static readonly string XamlFilter = $"Paint project (*{PaintProjectExtension})|*{PaintProjectExtension}";
@@ -50,7 +50,7 @@ namespace PoorMansPaint
             if (fileName == null) return;
 
             savedXamlString = XamlWriter.Save(Window.canvas.DrawingGroup);
-            SaveDrawingTo(fileName); 
+            SaveDrawingTo(fileName);
         }
         public void ExportToNewFile(string? chosenExtension = null)
         {
@@ -59,7 +59,7 @@ namespace PoorMansPaint
             SaveDrawingTo(fileName);
         }
 
-        protected void SaveDrawingTo(string file)
+        private void SaveDrawingTo(string file)
         {
             if (file is null) return;
 
@@ -80,7 +80,7 @@ namespace PoorMansPaint
                     MessageBoxImage.Error);
             }
         }
-        protected string? AskForXamlName()
+        private string? AskForXamlName()
         {
             // ask for save path and image type
             SaveFileDialog dialog = new SaveFileDialog();
@@ -92,7 +92,7 @@ namespace PoorMansPaint
 
             return dialog.FileName;
         }
-        protected string? AskForFileName(string? chosenExtension = null)
+        private string? AskForFileName(string? chosenExtension = null)
         {
             // ask for save path and image type
             SaveFileDialog dialog = new SaveFileDialog();
@@ -111,7 +111,7 @@ namespace PoorMansPaint
             return dialog.FileName;
         }
 
-        protected void SaveToXaml(string file)
+        private void SaveToXaml(string file)
         {
             if (file == null) throw new NullReferenceException(file);
             FileStream stream = new FileStream(file, FileMode.Create);

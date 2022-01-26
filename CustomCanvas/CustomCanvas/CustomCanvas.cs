@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
@@ -11,12 +12,26 @@ using System.Windows.Media.Imaging;
 namespace PoorMansPaint.CustomCanvas
 {
     // a canvas that is resizable, zoomable and operations on it are undoable
-    public class CustomCanvas : System.Windows.Controls.Canvas
+    public class CustomCanvas : Canvas, INotifyPropertyChanged
     {
         public static readonly double[] ZoomLevel = { 0.125, 0.25, 0.5, 0.75, 1, 2, 3, 4, 5, 6, 7, 8 };
         protected static int DEFAULT_ZOOM_INDEX = 4;
-        protected int currentZoomIdx;
+        protected int _currentZoomIdx;
+        public int CurrentZoomIndex
+        {
+            get { return _currentZoomIdx; }
+            set
+            {
+                if (value < 0 || value >= ZoomLevel.Length || _currentZoomIdx == value)
+                    return;
+                _currentZoomIdx = value;
+                ZoomLevelChanged?.Invoke(this, null);
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CurrentZoomIndex"));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CurrentZoom"));
+            }
+        }
         public event SizeChangedEventHandler ZoomLevelChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         private DrawingGroup _drawingGroup;
         public DrawingGroup DrawingGroup
@@ -78,15 +93,16 @@ namespace PoorMansPaint.CustomCanvas
             }
         }
 
-        public double CurrentZoom { get { return ZoomLevel[currentZoomIdx]; } }
+        public double CurrentZoom { get { return ZoomLevel[CurrentZoomIndex]; } }
         public CanvasCommander Commander { get; }
 
         public CustomCanvas () : base()
         {
             ScaleTransform scale = new ScaleTransform();
             LayoutTransform = scale;
+            SizeChanged += OnSizeChanged;
             ZoomLevelChanged += UpdateZoom;
-            SetZoomLevelIndex(DEFAULT_ZOOM_INDEX);
+            CurrentZoomIndex = DEFAULT_ZOOM_INDEX;
             _drawingGroup = new DrawingGroup(); 
             Commander = new CanvasCommander(this);
             Pen = new Pen(Brushes.Black, 1)
@@ -95,6 +111,12 @@ namespace PoorMansPaint.CustomCanvas
                 EndLineCap = PenLineCap.Round,
                 LineJoin = PenLineJoin.Round,
             };
+        }
+
+        private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Width"));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Height"));
         }
 
         protected override void OnInitialized(EventArgs e)
@@ -133,29 +155,21 @@ namespace PoorMansPaint.CustomCanvas
             return pos.X >= 0 && pos.Y >= 0 && pos.X <= Width && pos.Y <= Height;
         }
 
-        private void SetZoomLevelIndex(int idx)
-        {
-            if (idx < 0 || idx >= ZoomLevel.Length || currentZoomIdx == idx) 
-                return;
-            currentZoomIdx = idx;
-            ZoomLevelChanged?.Invoke(this, null);
-        }
-
         protected void UpdateZoom(object sender, SizeChangedEventArgs e)
         {
             ScaleTransform scale = GetCanvasScale();
-            scale.ScaleX = ZoomLevel[currentZoomIdx];
-            scale.ScaleY = ZoomLevel[currentZoomIdx];
+            scale.ScaleX = ZoomLevel[_currentZoomIdx];
+            scale.ScaleY = ZoomLevel[_currentZoomIdx];
         }
         public void ZoomIn()
         {
-            if (currentZoomIdx < ZoomLevel.Length - 1) 
-                SetZoomLevelIndex(currentZoomIdx + 1);
+            if (_currentZoomIdx < ZoomLevel.Length - 1) 
+                CurrentZoomIndex++;
         }
         public void ZoomOut()
         {
-            if (currentZoomIdx > 0) 
-                SetZoomLevelIndex(currentZoomIdx - 1);
+            if (_currentZoomIdx > 0)
+                CurrentZoomIndex--;
         }
 
         public void Reset()

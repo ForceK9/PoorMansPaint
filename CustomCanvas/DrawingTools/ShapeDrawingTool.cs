@@ -19,7 +19,7 @@ namespace PoorMansPaint.CustomCanvas
         protected GeometryGroup? _shape;
         protected Point? _startPoint;
 
-        protected ShapeDrawingTool()
+        public ShapeDrawingTool()
         {
             _startPoint = null;
         }
