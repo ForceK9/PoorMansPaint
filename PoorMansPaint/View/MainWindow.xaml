@@ -51,7 +51,6 @@
     </Window.InputBindings>
     <DockPanel LastChildFill="True">
         <Fluent:Ribbon DockPanel.Dock="Top"
-                       Height="150"
                        AreTabHeadersVisible="False">
             <Fluent:Ribbon.Menu>
                 <ToolBar Height="30">
@@ -305,14 +304,13 @@
                         Canvas.Top="{Binding Source={x:Static local:MainWindow.EaselToCanvasMargin}}"
                         Panel.ZIndex="10"
                         Background="White"
-                        Width="550" Height="325"
+                        Width="600" Height="350"
                         ClipToBounds="True"
                         RenderOptions.BitmapScalingMode="NearestNeighbor"/>
                 <Rectangle x:Name="rectPreviewResize"
                            Canvas.Left="{Binding ElementName=canvas, Path=(Canvas.Left)}"
                            Canvas.Top="{Binding ElementName=canvas, Path=(Canvas.Top)}"
                            StrokeDashArray="2 2" StrokeThickness="1" Stroke="Black"
-                           Width="500" Height="300"
                            Panel.ZIndex="15"
                            Visibility="Hidden"/>
                 <Thumb x:Name="thumbHorizontal"
