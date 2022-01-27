@@ -80,6 +80,32 @@ namespace PoorMansPaint
                     MessageBoxImage.Error);
             }
         }
+
+        // true mean user want to proceed with what they were doing
+        // false mean user canceled the action
+        public bool AskUserToSave()
+        {
+            if (CanBeSaved())
+            {
+                // user already does something
+                MessageBoxResult res = MessageBox.Show(
+                    "Do you want to save your changes?",
+                    Window.Title,
+                    MessageBoxButton.YesNoCancel,
+                    MessageBoxImage.Question);
+                switch (res)
+                {
+                    case MessageBoxResult.Yes:
+                        Save();
+                        break;
+                    case MessageBoxResult.No:
+                        break;
+                    default: return false;
+                }
+            }
+            return true;
+        }
+
         private string? AskForXamlName()
         {
             // ask for save path and image type
@@ -121,24 +147,7 @@ namespace PoorMansPaint
 
         public void New()
         {
-            if (CanBeSaved())
-            {
-                // user already does something
-                MessageBoxResult res = MessageBox.Show(
-                    "Do you want to save your changes?",
-                    Window.Title,
-                    MessageBoxButton.YesNoCancel,
-                    MessageBoxImage.Question);
-                switch (res)
-                {
-                    case MessageBoxResult.Yes:
-                        Save();
-                        break;
-                    case MessageBoxResult.No:
-                        break;
-                    default: return;
-                }
-            }
+            if (!AskUserToSave()) return;
             Window.canvas.Reset();
             fileName = null; savedXamlString = null;
         }
@@ -149,23 +158,7 @@ namespace PoorMansPaint
             dialog.Filter = XamlFilter;
             if (dialog.ShowDialog() == false) return;
 
-            if (CanBeSaved()) {
-                // user already does something
-                MessageBoxResult res = MessageBox.Show(
-                    "Do you want to save your changes?", 
-                    Window.Title, 
-                    MessageBoxButton.YesNoCancel, 
-                    MessageBoxImage.Question);
-                switch (res)
-                {
-                    case MessageBoxResult.Yes:
-                        Save();
-                        break;
-                    case MessageBoxResult.No:
-                        break;
-                    default: return;
-                }
-            }
+            if (!AskUserToSave()) return;
 
             fileName = dialog.FileName;
             LoadFromXaml(fileName);

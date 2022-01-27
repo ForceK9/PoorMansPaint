@@ -1,6 +1,7 @@
 ﻿using PoorMansPaint.CustomCanvas;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -414,6 +415,11 @@ namespace PoorMansPaint
                 statusBar.Visibility = Visibility.Visible;
                 ((Image)menuItem.Icon).Visibility = Visibility.Visible;
             }
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            if (!saverLoader.AskUserToSave()) e.Cancel = true;
         }
     }
 }
